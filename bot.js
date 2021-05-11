@@ -54,7 +54,7 @@ bot.onText(/\/price (.+)/, async (msg, match) => {
 
   const cryptoData = await getPriceData(cryptoSymbol);
 
-  const message = `*${cryptoData.name} (${cryptoData.symbol})*: ${cryptoData.currentPriceInUSD} USD | ${cryptoData.percentageChange24hrs}% ${cryptoData.percentageChange24hrs > 0 ?  "increase" : "decrease"} no err- 24hr`;
+  const message = `*${cryptoData.name} (${cryptoData.symbol})*: ${cryptoData.currentPriceInUSD} USD | ${cryptoData.percentageChange24hrs}% ${cryptoData.percentageChange24hrs > 0 ?  "increase" : "decrease"} 24hr`;
 
   // send back the matched "whatever" to the chat
   bot.sendMessage(chatId, message, { parse_mode: "MARKDOWN" });
