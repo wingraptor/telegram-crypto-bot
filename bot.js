@@ -36,11 +36,13 @@ async function getCryptoData(cryptoSymbol, command) {
     return error;
   }
 
-  if ((command === "priceData")) {
+  if (command === "priceData") {
     const specificCryptoData = data.data.data[Object.keys(data.data.data)[0]];
-    const currentPriceInUSD = specificCryptoData.quote.USD.price.toLocaleString({
-      maximumFractionDigits: 4,
-    });
+    const currentPriceInUSD = specificCryptoData.quote.USD.price.toLocaleString(
+      {
+        maximumFractionDigits: 4,
+      }
+    );
     const percentageChange24hrs =
       specificCryptoData.quote.USD.percent_change_24h.toFixed(2);
     const name = specificCryptoData.name;
@@ -51,7 +53,7 @@ async function getCryptoData(cryptoSymbol, command) {
       name,
       symbol,
     };
-  } else if ((command === "infoData")) {
+  } else if (command === "infoData") {
     const specificCryptoData = data.data.data[Object.keys(data.data.data)[0]];
     const currentMarketCap =
       specificCryptoData.quote.USD.market_cap.toLocaleString({
@@ -64,6 +66,11 @@ async function getCryptoData(cryptoSymbol, command) {
       specificCryptoData.circulating_supply.toLocaleString({
         maximumFractionDigits: 2,
       });
+    const currentPriceInUSD = specificCryptoData.quote.USD.price.toLocaleString(
+      {
+        maximumFractionDigits: 4,
+      }
+    );
     const name = specificCryptoData.name;
     const symbol = specificCryptoData.symbol;
     return {
@@ -72,6 +79,7 @@ async function getCryptoData(cryptoSymbol, command) {
       circulatingSupply,
       name,
       symbol,
+      currentPriceInUSD
     };
   }
 }
@@ -125,11 +133,10 @@ bot.onText(/\/info (.+)/, async (msg, match) => {
     message = "Error...try again loser";
   }
 
-  message = `*${cryptoData.name} (${cryptoData.symbol})*: 
- *Marketcap*: $${
-    cryptoData.currentMarketCap
-  } USD
- *Volume (24hr):* $${cryptoData.volume24hr} USD  
+  message = `*${cryptoData.name} (${cryptoData.symbol})*:
+ ${cryptoData.currentPriceInUSD} 
+ *Marketcap*: $${cryptoData.currentMarketCap}
+ *Volume (24hr):* $${cryptoData.volume24hr}  
  *Circulating Supply*: ${cryptoData.circulatingSupply} coins`;
 
   // send back the matched "whatever" to the chat
