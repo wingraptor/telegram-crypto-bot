@@ -126,10 +126,10 @@ bot.onText(/\/info (.+)/, async (msg, match) => {
   }
 
   message = `*${cryptoData.name} (${cryptoData.symbol})*: 
- *Marketcap*: ${
+ *Marketcap*: $${
     cryptoData.currentMarketCap
-  } USD | 
- *Volume (24hr):* ${cryptoData.volume24hr} USD |  
+  } USD
+ *Volume (24hr):* $${cryptoData.volume24hr} USD  
  *Circulating Supply*: ${cryptoData.circulatingSupply} coins`;
 
   // send back the matched "whatever" to the chat
