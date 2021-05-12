@@ -134,7 +134,7 @@ bot.onText(/\/info (.+)/, async (msg, match) => {
   }
 
   message = `*${cryptoData.name} (${cryptoData.symbol})*:
- ${cryptoData.currentPriceInUSD}USD 
+ ${cryptoData.currentPriceInUSD} USD 
  *Marketcap*: $${cryptoData.currentMarketCap}
  *Volume (24hr):* $${cryptoData.volume24hr}  
  *Circulating Supply*: ${cryptoData.circulatingSupply} coins`;
