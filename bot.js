@@ -66,6 +66,19 @@ async function getCryptoData(cryptoSymbol, command) {
       specificCryptoData.circulating_supply.toLocaleString({
         maximumFractionDigits: 2,
       });
+    const percentageChange1hr =
+      specificCryptoData.quote.USD.percent_change_1h.toLocaleString({
+        maximumFractionDigits: 2,
+      });
+    const percentageChange24hr =
+      specificCryptoData.quote.USD.percent_change_24h.toLocaleString({
+        maximumFractionDigits: 2,
+      });
+    const percentageChange7days =
+      specificCryptoData.quote.USD.percent_change_7d.toLocaleString({
+        maximumFractionDigits: 2,
+      });
+    const position = specificCryptoData.cmc_rank;
     const currentPriceInUSD = specificCryptoData.quote.USD.price.toLocaleString(
       {
         maximumFractionDigits: 4,
@@ -79,7 +92,11 @@ async function getCryptoData(cryptoSymbol, command) {
       circulatingSupply,
       name,
       symbol,
-      currentPriceInUSD
+      currentPriceInUSD,
+      percentageChange1hr,
+      percentageChange24hr,
+      percentageChange7days,
+      position,
     };
   }
 }
@@ -134,9 +151,13 @@ bot.onText(/\/info (.+)/, async (msg, match) => {
   }
 
   message = `*${cryptoData.name} (${cryptoData.symbol})*:
- ${cryptoData.currentPriceInUSD} USD 
- *Marketcap*: $${cryptoData.currentMarketCap}
- *Volume (24hr):* $${cryptoData.volume24hr}  
+ $${cryptoData.currentPriceInUSD} 
+ *Cap*: $${cryptoData.currentMarketCap}
+ *Position*: ${cryptoData.position}
+ *Vol (24hr):* $${cryptoData.volume24hr}
+ *1hr*: ${cryptoData.percentageChange1hr}%
+ *24hr*: ${cryptoData.percentageChange24hr}%
+ *7d*: ${cryptoData.percentageChange7days}%
  *Circulating Supply*: ${cryptoData.circulatingSupply} coins`;
 
   // send back the matched "whatever" to the chat
