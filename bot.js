@@ -14,7 +14,7 @@ async function getCryptoData(cryptoSymbol, command) {
   let params = {};
   let data = {};
 
-  if (command === "priceData" || command === "infoData") {
+  if (command === "priceData" || command === "infoData" || command === "lambo") {
     endPoint = "/v1/cryptocurrency/quotes/latest";
     params = {
       symbol: cryptoSymbolUpperCased,
@@ -98,6 +98,15 @@ async function getCryptoData(cryptoSymbol, command) {
       percentageChange7days,
       position,
     };
+  } else if(command === "lambo") {
+    const specificCryptoData = data.data.data[Object.keys(data.data.data)[0]];
+    const currentPriceInUSD = specificCryptoData.quote.USD.price.toFixed(2);
+    const coinsForLambo = Math.round(500000 / currentPriceInUSD)
+    const symbol = specificCryptoData.symbol
+    return {
+      coinsForLambo,
+      symbol
+    };
   }
 }
 
@@ -131,6 +140,7 @@ bot.onText(/\/price (.+)/, async (msg, match) => {
 });
 
 //--------------------------------------------------------------------//
+
 /* GET CRYPTO INFO FOLLOWING A '/info [cryptosymbol]' COMMAND */
 // Capture text (should be cryptosymbol e.g eth or ETH) that proceeds after the command /price "
 bot.onText(/\/info (.+)/, async (msg, match) => {
@@ -159,6 +169,34 @@ bot.onText(/\/info (.+)/, async (msg, match) => {
  *24hr*: ${cryptoData.percentageChange24hr}%
  *7d*: ${cryptoData.percentageChange7days}%
  *Circulating Supply*: ${cryptoData.circulatingSupply} coins`;
+
+  // send back the matched "whatever" to the chat
+  bot.sendMessage(chatId, message, { parse_mode: "MARKDOWN" });
+});
+
+
+//--------------------------------------------------------------------//
+
+/* GET CRYPTO INFO FOLLOWING A '/lambo [cryptosymbol]' COMMAND */
+// Capture text (should be cryptosymbol e.g eth or ETH) that proceeds after the command /price "
+bot.onText(/\/lambo (.+)/, async (msg, match) => {
+  // message is message being sent to person querying bot
+  let message = "Sumn nuh right";
+  let command = "lambo";
+  let error = "";
+  // 'msg' is the received Message from Telegram
+  // 'match' is the result of executing the regexp above on the text content
+  // of the message
+  const chatId = msg.chat.id;
+  const cryptoSymbol = match[1]; // the captured "cryptoCode"
+
+  const cryptoData = await getCryptoData(cryptoSymbol, command);
+
+  if (cryptoData === error) {
+    message = "Error...try again loser";
+  }
+
+  message = `You need ${cryptoData.coinsForLambo} ${cryptoData.symbol} to buy a Lambo   🏎️💨💨`;
 
   // send back the matched "whatever" to the chat
   bot.sendMessage(chatId, message, { parse_mode: "MARKDOWN" });
