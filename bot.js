@@ -8,13 +8,44 @@ require("dotenv").config();
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: true });
 
+async function getNews(searchQuery) {
+  let endPoint = "everything";
+  let params = {
+    q: searchQuery,
+    sortBy: "publishedAt",
+    pageSize: 5,
+    language: "en",
+  };
+  let articles = [];
+  const newsAPIQueryOptions = {
+    url: `https://newsapi.org/v2/${endPoint}`,
+    headers: {
+      "X-Api-Key": process.env.NEWS_API,
+    },
+    params,
+    method: "get",
+  };
+
+  try {
+    const response = await axios(newsAPIQueryOptions);
+    articles = response.data.articles;
+    return articles;
+  } catch (error) {
+    return error;
+  }
+}
+
 async function getCryptoData(cryptoSymbol, command) {
   const cryptoSymbolUpperCased = cryptoSymbol.toUpperCase();
   let endPoint = "";
   let params = {};
   let data = {};
 
-  if (command === "priceData" || command === "infoData" || command === "lambo") {
+  if (
+    command === "priceData" ||
+    command === "infoData" ||
+    command === "lambo"
+  ) {
     endPoint = "/v1/cryptocurrency/quotes/latest";
     params = {
       symbol: cryptoSymbolUpperCased,
@@ -98,14 +129,14 @@ async function getCryptoData(cryptoSymbol, command) {
       percentageChange7days,
       position,
     };
-  } else if(command === "lambo") {
+  } else if (command === "lambo") {
     const specificCryptoData = data.data.data[Object.keys(data.data.data)[0]];
     const currentPriceInUSD = specificCryptoData.quote.USD.price.toFixed(2);
-    const coinsForLambo = Math.round(500000 / currentPriceInUSD)
-    const symbol = specificCryptoData.symbol
+    const coinsForLambo = Math.round(500000 / currentPriceInUSD);
+    const symbol = specificCryptoData.symbol;
     return {
       coinsForLambo,
-      symbol
+      symbol,
     };
   }
 }
@@ -174,7 +205,6 @@ bot.onText(/\/info (.+)/, async (msg, match) => {
   bot.sendMessage(chatId, message, { parse_mode: "MARKDOWN" });
 });
 
-
 //--------------------------------------------------------------------//
 
 /* GET CRYPTO INFO FOLLOWING A '/lambo [cryptosymbol]' COMMAND */
@@ -197,6 +227,36 @@ bot.onText(/\/lambo (.+)/, async (msg, match) => {
   }
 
   message = `You need ${cryptoData.coinsForLambo} ${cryptoData.symbol} to buy a Lambo   🏎️💨💨`;
+
+  // send back the matched "whatever" to the chat
+  bot.sendMessage(chatId, message, { parse_mode: "MARKDOWN" });
+});
+
+//--------------------------------------------------------------------//
+
+/* GET News INFO FOLLOWING A '/news [searchQuery]' COMMAND */
+bot.onText(/\/news (.+)/, async (msg, match) => {
+  let error = "";
+  // 'msg' is the received Message from Telegram
+  // 'match' is the result of executing the regexp above on the text content
+  // of the message
+  const chatId = msg.chat.id;
+  const searchQuery = match[1]; // the captured "cryptoCode"
+  // message is message being sent to person querying bot
+  let message = `*Latest Headlines For ${searchQuery}*`;
+
+  const articles = await getNews(searchQuery);
+
+  // console.log(searchQuery + "1");
+
+  articles.forEach((article) => {
+    message += `
+
+*${article.source.name}*: ${article.title} - ${article.url}
+    `;
+  });
+
+  // console.log(message);
 
   // send back the matched "whatever" to the chat
   bot.sendMessage(chatId, message, { parse_mode: "MARKDOWN" });
