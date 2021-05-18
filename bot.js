@@ -8,10 +8,11 @@ require("dotenv").config();
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: true });
 
+// Get News Query Results
 async function getNews(searchQuery) {
   let endPoint = "everything";
   let params = {
-    q: searchQuery,
+    qInTitle: searchQuery,
     sortBy: "publishedAt",
     pageSize: 5,
     language: "en",
